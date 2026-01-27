@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+
+<div class="error-container">
+  <h1><%= statusCode || 500 %></h1>
+  <h2><%= message || 'Something went wrong' %></h2>
+  <% if (redirectUrl) { %>
+    <a href="<%= redirectUrl %>" class="btn btn-primary">Go to Login</a>
+  <% } else { %>
+    <a href="/todos" class="btn btn-primary">Back to Home</a>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

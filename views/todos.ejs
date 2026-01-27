@@ -1,0 +1,80 @@
+<%- include('partials/header') %>
+
+<div class="todos-container">
+  <div class="todos-header">
+    <h2>My Tasks</h2>
+    <button class="btn btn-primary" onclick="showAddTodoForm()">+ Add Task</button>
+  </div>
+
+  <div id="addTodoForm" class="todo-form" style="display: none;">
+    <form action="/todos" method="POST">
+      <div class="form-group">
+        <input type="text" name="title" placeholder="Task title" required>
+      </div>
+      <div class="form-group">
+        <textarea name="description" placeholder="Description (optional)" rows="3"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Add</button>
+        <button type="button" class="btn btn-outline" onclick="hideAddTodoForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Filter:</label>
+      <select onchange="filterTodos(this.value)">
+        <option value="all" <%= currentStatus === 'all' ? 'selected' : '' %>>All</option>
+        <option value="pending" <%= currentStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+        <option value="completed" <%= currentStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Sort:</label>
+      <select onchange="sortTodos(this.value)">
+        <option value="newest" <%= currentSort === 'newest' ? 'selected' : '' %>>Newest First</option>
+        <option value="oldest" <%= currentSort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+        <option value="status" <%= currentSort === 'status' ? 'selected' : '' %>>By Status</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="todos-list">
+    <% if (todos.length === 0) { %>
+      <div class="empty-state">
+        <p>No tasks found. Start by adding a new task!</p>
+      </div>
+    <% } else { %>
+      <% todos.forEach(todo => { %>
+        <div class="todo-item <%= todo.status %>" data-id="<%= todo._id %>">
+          <div class="todo-content">
+            <h3 class="todo-title <%= todo.status === 'completed' ? 'completed' : '' %>">
+              <%= todo.title %>
+            </h3>
+            <% if (todo.description) { %>
+              <p class="todo-description"><%= todo.description %></p>
+            <% } %>
+            <span class="todo-date"><%= new Date(todo.createdAt).toLocaleDateString() %></span>
+          </div>
+          <div class="todo-actions">
+            <% if (todo.status === 'pending') { %>
+              <button class="btn btn-sm btn-success" onclick="updateTodoStatus('<%= todo._id %>', 'completed')">
+                ✓ Complete
+              </button>
+            <% } else { %>
+              <button class="btn btn-sm btn-warning" onclick="updateTodoStatus('<%= todo._id %>', 'pending')">
+                ↺ Reopen
+              </button>
+            <% } %>
+            <button class="btn btn-sm btn-danger" onclick="deleteTodo('<%= todo._id %>')">
+              Delete
+            </button>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
