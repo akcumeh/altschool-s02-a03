@@ -373,7 +373,7 @@ main {
 
     .todos-container {
         padding: 1.5rem;
-        margin: 0 1rem;
+        margin: 1rem 0;
     }
 
     .auth-card {
@@ -390,10 +390,6 @@ main {
     .todo-actions {
         width: 100%;
         justify-content: flex-start;
-    }
-
-    .filters {
-        flex-direction: column;
     }
 
     main {

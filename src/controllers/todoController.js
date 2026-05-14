@@ -1,10 +1,19 @@
 const Todo = require('../models/Todo');
-const { validationResult } = require('express-validator');
+
+const validateTodo = (title) => {
+  const errors = [];
+
+  if (!title || title.trim().length === 0) {
+    errors.push('Title is required');
+  }
+
+  return errors;
+};
 
 exports.getTodos = async (req, res) => {
   try {
     const { status, sort } = req.query;
-    const filter = { userId: req.session.userId };
+    const filter = { userId: req.userId };
 
     if (status && status !== 'all') {
       filter.status = status;
@@ -21,14 +30,35 @@ exports.getTodos = async (req, res) => {
 
     const todos = await Todo.find(filter).sort(sortOption);
 
+    const isApiRequest = (req.headers.accept && req.headers.accept.includes('application/json')) ||
+                         (req.headers.authorization && req.headers.authorization.startsWith('Bearer'));
+
+    if (isApiRequest) {
+      return res.status(200).json({
+        success: true,
+        data: todos
+      });
+    }
+
     res.render('todos', {
       todos,
-      username: req.session.username,
+      username: req.username,
       currentStatus: status || 'all',
       currentSort: sort || 'newest'
     });
   } catch (error) {
     console.error('Error fetching todos:', error.message);
+
+    const isApiRequest = (req.headers.accept && req.headers.accept.includes('application/json')) ||
+                         (req.headers.authorization && req.headers.authorization.startsWith('Bearer'));
+
+    if (isApiRequest) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching todos'
+      });
+    }
+
     res.status(500).render('error', {
       error: 'Error fetching todos',
       statusCode: 500
@@ -38,25 +68,34 @@ exports.getTodos = async (req, res) => {
 
 exports.createTodo = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.redirect('/todos?error=' + encodeURIComponent(errors.array()[0].msg));
-    }
-
     const { title, description } = req.body;
+
+    const validationErrors = validateTodo(title);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors[0]
+      });
+    }
 
     const todo = new Todo({
       title,
       description,
-      userId: req.session.userId
+      userId: req.userId
     });
 
     await todo.save();
 
-    res.redirect('/todos');
+    res.status(201).json({
+      success: true,
+      data: todo
+    });
   } catch (error) {
     console.error('Error creating todo:', error.message);
-    res.redirect('/todos?error=' + encodeURIComponent('Error creating todo'));
+    res.status(500).json({
+      success: false,
+      message: 'Error creating todo'
+    });
   }
 };
 
@@ -65,7 +104,7 @@ exports.updateTodoStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const todo = await Todo.findOne({ _id: id, userId: req.session.userId });
+    const todo = await Todo.findOne({ _id: id, userId: req.userId });
 
     if (!todo) {
       return res.status(404).json({
@@ -94,7 +133,7 @@ exports.deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const todo = await Todo.findOne({ _id: id, userId: req.session.userId });
+    const todo = await Todo.findOne({ _id: id, userId: req.userId });
 
     if (!todo) {
       return res.status(404).json({

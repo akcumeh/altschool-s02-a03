@@ -1,87 +1,88 @@
-# Todo Application - AltSchool Assignment
+# altschool-s02-a03 - Todo App
+AltSchool Second Semester Assignment 03
 
-A full-stack todo application built with Node.js, Express, MongoDB, and EJS. Features user authentication with JWT, task management with three states (pending, completed, deleted), and a clean, responsive UI.
+A full-stack todo application built with Node.js, Express, MongoDB, and EJS. Users can register, log in, and manage tasks with three states (pending, completed, deleted), with a clean, responsive interface.
 
 ## Features
 
-- User registration and authentication with JWT
+- User registration and login with JWT authentication
 - Secure password hashing with bcrypt
-- Create, read, update, and delete todos
+- Create, update, and delete todos
 - Three task states: pending, completed, deleted
-- Filter todos by status
-- Sort todos by date or status
+- Filter and sort todos by status or date
 - Session management with MongoDB store
 - Global error handling and logging
-- Responsive design
-- RESTful API
-
-## Tech Stack
-
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT (JSON Web Tokens), bcryptjs
-- **Template Engine**: EJS
-- **Session Management**: express-session with connect-mongo
-- **Validation**: express-validator
-- **Testing**: Jest, Supertest
-- **Development**: Nodemon
+- Responsive UI with EJS templating
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB (local or Atlas cluster)
-- npm or yarn
+Before running this project, make sure you have the following:
 
-## Installation
+- [Node.js](https://nodejs.org/) (v14 or higher)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+- [Git](https://git-scm.com/)
+- A [MongoDB](https://www.mongodb.com/) account or local MongoDB installation
 
-1. Clone the repository
+## Getting Started
+
+### 1. Clone the Repository
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/akcumeh/altschool-s02-a03.git
 cd altschool-s02-a03
 ```
 
-2. Install dependencies
+### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-3. Create environment file
+### 3. Set Up Environment Variables
+
+Copy `.env.example` to `.env` and fill in the values:
+
 ```bash
 cp .env.example .env
 ```
 
-4. Configure environment variables in `.env`
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/todo-app
-JWT_SECRET=your_jwt_secret_key_here
-SESSION_SECRET=your_session_secret_key_here
-NODE_ENV=development
-```
+Your `.env` should contain:
+- `PORT`: Port to run on (default: `3000`)
+- `MONGODB_URI`: Your MongoDB connection string (e.g., `mongodb://localhost:27017/todo-app`)
+- `JWT_SECRET`: A random string used for JWT generation
+- `SESSION_SECRET`: A random string used for session signing
+- `NODE_ENV`: Environment (e.g., `development` or `production`)
 
-5. Start MongoDB (if running locally)
+### 4. Run Tests (Optional)
+
 ```bash
-mongod
+npm test
 ```
 
-## Running the Application
+### 5. Start the Development Server
 
-### Development Mode
 ```bash
 npm run dev
 ```
 
-### Production Mode
-```bash
-npm start
-```
+The application will be available at `http://localhost:3000`.
 
-The application will be available at `http://localhost:3000`
+## API Endpoints
 
-## Running Tests
-```bash
-npm test
-```
+Base URL (local): `http://localhost:3000`
+
+### Auth
+- `GET /auth/register` - Registration page
+- `POST /auth/register` - Register a new user
+- `GET /auth/login` - Login page
+- `POST /auth/login` - Log in and receive a session
+- `GET /auth/logout` - Log out
+
+### Todos *(auth required)*
+- `GET /todos` - View all todos for the logged-in user
+- `POST /todos` - Create a new todo
+- `PATCH /todos/:id` - Update a todo's status
+- `DELETE /todos/:id` - Delete a todo
 
 ## Project Structure
 
@@ -89,23 +90,23 @@ npm test
 altschool-s02-a03/
 ├── src/
 │   ├── config/
-│   │   └── database.js
+│   │   └── database.js        # Database configuration
 │   ├── controllers/
-│   │   ├── authController.js
-│   │   └── todoController.js
+│   │   ├── authController.js  # Auth logic
+│   │   └── todoController.js  # Todo CRUD logic
 │   ├── middleware/
-│   │   ├── auth.js
-│   │   └── errorHandler.js
+│   │   ├── auth.js            # JWT auth middleware
+│   │   └── errorHandler.js    # Global error handler
 │   ├── models/
-│   │   ├── User.js
-│   │   └── Todo.js
+│   │   ├── User.js            # User db model
+│   │   └── Todo.js            # Todo db model
 │   ├── routes/
-│   │   ├── authRoutes.js
-│   │   └── todoRoutes.js
+│   │   ├── authRoutes.js      # Auth routes
+│   │   └── todoRoutes.js      # Todo routes
 │   ├── utils/
-│   │   └── logger.js
-│   ├── app.js
-│   └── server.js
+│   │   └── logger.js          # Logging utility
+│   ├── app.js                 # Express app setup
+│   └── server.js              # Application entry point
 ├── views/
 │   ├── partials/
 │   │   ├── header.ejs
@@ -123,109 +124,41 @@ altschool-s02-a03/
 │   ├── auth.test.js
 │   └── todo.test.js
 ├── .env.example
-├── .gitignore
-├── ER-DIAGRAM.md
-├── package.json
-└── README.md
+└── package.json
 ```
-
-## API Endpoints
-
-### Authentication
-- `GET /auth/register` - Registration page
-- `POST /auth/register` - Register new user
-- `GET /auth/login` - Login page
-- `POST /auth/login` - Login user
-- `GET /auth/logout` - Logout user
-
-### Todos (Protected Routes)
-- `GET /todos` - Get all todos for logged-in user
-- `POST /todos` - Create new todo
-- `PATCH /todos/:id` - Update todo status
-- `DELETE /todos/:id` - Soft delete todo
 
 ## Database Schema
 
-See [ER-DIAGRAM.md](./ER-DIAGRAM.md) for detailed entity relationship diagram.
+See [ER-DIAGRAM.md](./ER-DIAGRAM.md) for a full entity relationship diagram.
 
-### User Model
-- username (String, unique, min 3 chars)
-- password (String, hashed, min 6 chars)
-- createdAt (Date)
+### User
+- `username` (string, required, unique, min 3 chars)
+- `password` (string, required, hashed, min 6 chars)
+- `createdAt` (date, auto-generated)
 
-### Todo Model
-- title (String, required)
-- description (String, optional)
-- status (Enum: pending, completed, deleted)
-- userId (ObjectId, reference to User)
-- createdAt (Date)
-- updatedAt (Date)
+### Todo
+- `title` (string, required)
+- `description` (string, optional)
+- `status` (enum: `pending` | `completed` | `deleted`, default: `pending`)
+- `userId` (ref: User, required)
+- `createdAt` / `updatedAt` (dates, auto-generated)
 
-## Features Implementation
+## Stack Used
 
-### User Authentication
-- JWT-based authentication
-- Password hashing with bcrypt (10 rounds)
-- Session storage in MongoDB
-- Protected routes with authentication middleware
-
-### Todo Management
-- Users can only see their own tasks
-- Soft delete (status changed to 'deleted')
-- Filter by status (all, pending, completed)
-- Sort by date (newest/oldest) or status
-- Real-time UI updates
-
-### Error Handling
-- Global error handler middleware
-- Validation errors with express-validator
-- Proper HTTP status codes
-- User-friendly error messages
-
-### Logging
-- Custom logger utility
-- Timestamp-based logs
-- Different log levels (info, error, warn, debug)
-- Console output formatting
-
-## Testing
-
-The application includes comprehensive tests for:
-- User registration and validation
-- User login and authentication
-- Todo creation, update, and deletion
-- Authorization (users can only modify their own todos)
-
-## Deployment
-
-The application is ready for deployment on platforms like:
-- Render
-- Heroku
-- Railway
-- Vercel (with server setup)
-- AWS/GCP/Azure
-
-### Deployment Notes
-1. Set `NODE_ENV=production` in environment variables
-2. Use a production MongoDB database (MongoDB Atlas recommended)
-3. Generate strong JWT_SECRET and SESSION_SECRET values
-4. Enable secure cookies in production
-5. Configure CORS if needed for API access
-
-## Security Features
-
-- Password hashing with bcrypt
-- JWT token-based authentication
-- HTTP-only session cookies
-- Input validation and sanitization
-- XSS protection through EJS auto-escaping
-- Session expiration (7 days)
-- Protected routes with authentication middleware
-
-## License
-
-ISC
+- **Node.js** (**Express.js**) - Web framework
+- **MongoDB** - Database
+- **Mongoose** - ODM for MongoDB
+- **EJS** - Server-side templating
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+- **express-session** + **connect-mongo** - Session management
+- **express-validator** - Request validation
+- **Jest** + **Supertest** - Testing
+- **dotenv** - Environment variable management
 
 ## Author
 
-AltSchool Student - Second Semester Assignment 3
+Thank you for reading this far! Connect with me on:
+
+- GitHub - [Angel Umeh](https://github.com/akcumeh)
+- Twitter - [@akcumeh](https://x.com/akcumeh)

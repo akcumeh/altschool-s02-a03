@@ -8,17 +8,23 @@
     "dev": "nodemon src/app.js",
     "test": "jest --runInBand --detectOpenHandles"
   },
-  "keywords": ["todo", "nodejs", "express", "mongodb"],
+  "keywords": [
+    "todo",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.2.1",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.3"
   },
   "devDependencies": {
@@ -28,7 +34,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "coveragePathIgnorePatterns": ["/node_modules/"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
     "testTimeout": 10000
   }
 }

@@ -4,6 +4,7 @@ const app = require('../src/app');
 const User = require('../src/models/User');
 const Todo = require('../src/models/Todo');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 let testUser;
 let testToken;
@@ -24,9 +25,10 @@ describe('Todo Tests', () => {
     await User.deleteMany({});
     await Todo.deleteMany({});
 
+    const hashedPassword = await bcrypt.hash('password123', 10);
     testUser = await User.create({
       username: 'todouser',
-      password: 'password123'
+      password: hashedPassword
     });
 
     testToken = jwt.sign(
@@ -75,6 +77,7 @@ describe('Todo Tests', () => {
     it('should not create todo without authentication', async () => {
       const response = await agent
         .post('/todos')
+        .set('Accept', 'application/json')
         .send({
           title: 'Test Todo'
         });
@@ -109,9 +112,10 @@ describe('Todo Tests', () => {
     });
 
     it('should not update todo of another user', async () => {
+      const hashedPassword = await bcrypt.hash('password123', 10);
       const otherUser = await User.create({
         username: 'otheruser',
-        password: 'password123'
+        password: hashedPassword
       });
 
       const otherToken = jwt.sign(
@@ -153,9 +157,10 @@ describe('Todo Tests', () => {
     });
 
     it('should not delete todo of another user', async () => {
+      const hashedPassword = await bcrypt.hash('password123', 10);
       const otherUser = await User.create({
         username: 'otheruser',
-        password: 'password123'
+        password: hashedPassword
       });
 
       const otherToken = jwt.sign(

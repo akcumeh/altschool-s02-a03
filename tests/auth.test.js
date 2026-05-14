@@ -2,6 +2,7 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../src/app');
 const User = require('../src/models/User');
+const bcrypt = require('bcryptjs');
 
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGODB_URI);
@@ -21,6 +22,7 @@ describe('Authentication Tests', () => {
     it('should register a new user and return JWT token', async () => {
       const response = await request(app)
         .post('/auth/register')
+        .set('Accept', 'application/json')
         .send({
           username: 'testuser',
           password: 'password123'
@@ -38,13 +40,15 @@ describe('Authentication Tests', () => {
     });
 
     it('should not register user with duplicate username', async () => {
+      const hashedPassword = await bcrypt.hash('password123', 10);
       await User.create({
         username: 'testuser',
-        password: 'password123'
+        password: hashedPassword
       });
 
       const response = await request(app)
         .post('/auth/register')
+        .set('Accept', 'application/json')
         .send({
           username: 'testuser',
           password: 'password456'
@@ -58,6 +62,7 @@ describe('Authentication Tests', () => {
     it('should not register user with short username', async () => {
       const response = await request(app)
         .post('/auth/register')
+        .set('Accept', 'application/json')
         .send({
           username: 'ab',
           password: 'password123'
@@ -71,6 +76,7 @@ describe('Authentication Tests', () => {
     it('should not register user with short password', async () => {
       const response = await request(app)
         .post('/auth/register')
+        .set('Accept', 'application/json')
         .send({
           username: 'testuser',
           password: '12345'
@@ -84,15 +90,17 @@ describe('Authentication Tests', () => {
 
   describe('POST /auth/login', () => {
     beforeEach(async () => {
+      const hashedPassword = await bcrypt.hash('password123', 10);
       await User.create({
         username: 'testuser',
-        password: 'password123'
+        password: hashedPassword
       });
     });
 
     it('should login with valid credentials and return JWT token', async () => {
       const response = await request(app)
         .post('/auth/login')
+        .set('Accept', 'application/json')
         .send({
           username: 'testuser',
           password: 'password123'
@@ -117,6 +125,7 @@ describe('Authentication Tests', () => {
     it('should not login with invalid username', async () => {
       const response = await request(app)
         .post('/auth/login')
+        .set('Accept', 'application/json')
         .send({
           username: 'wronguser',
           password: 'password123'
@@ -130,6 +139,7 @@ describe('Authentication Tests', () => {
     it('should not login with invalid password', async () => {
       const response = await request(app)
         .post('/auth/login')
+        .set('Accept', 'application/json')
         .send({
           username: 'testuser',
           password: 'wrongpassword'
